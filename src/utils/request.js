@@ -1,9 +1,25 @@
+/*
+ * @Author: Hey
+ * @Date: 2021-01-29 16:52:08
+ * @LastEditTime: 2021-02-01 17:35:44
+ * @LastEditors: Hey
+ * @Description:
+ * @FilePath: \vue-h5-template\src\utils\request.js
+ */
 import axios from 'axios'
-import store from '@/store'
-import { Toast } from 'vant'
+import {
+  Toast,
+  Notify
+} from 'vant'
 // 根据环境不同引入不同api地址
-import { baseApi } from '@/config'
+import {
+  baseApi
+} from '@/config'
+import {
+  getStroage
+} from './stroage'
 // create an axios instance
+const Authorization = getStroage()
 const service = axios.create({
   baseURL: baseApi, // url = base api url + request url
   withCredentials: true, // send cookies when cross-domain requests
@@ -20,13 +36,15 @@ service.interceptors.request.use(
         forbidClick: true
       })
     }
-    if (store.getters.token) {
-      config.headers['X-Token'] = ''
-    }
+    config.headers['Authorization'] = Authorization || ''
     return config
   },
   error => {
     // do something with request error
+    Notify({
+      type: 'error',
+      message: res || '访问错误,请稍后重试'
+    })
     console.log(error) // for debug
     return Promise.reject(error)
   }
@@ -38,11 +56,10 @@ service.interceptors.response.use(
     const res = response.data
     if (res.status && res.status !== 200) {
       // 登录超时,重新登录
-      if (res.status === 401) {
-        store.dispatch('FedLogOut').then(() => {
-          location.reload()
-        })
-      }
+      Notify({
+        type: 'error',
+        message: res || '访问错误,请稍后重试'
+      })
       return Promise.reject(res || 'error')
     } else {
       return Promise.resolve(res)

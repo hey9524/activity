@@ -81,13 +81,13 @@ module.exports = {
         afterColon: true
       }
     ],
-    'keyword-spacing': [
-      2,
-      {
-        before: true,
-        after: true
-      }
-    ],
+    // 'keyword-spacing': [
+    //   2,
+    //   {
+    //     before: true,
+    //     after: true
+    //   }
+    // ],
     'new-cap': [
       2,
       {
