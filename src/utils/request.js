@@ -1,7 +1,7 @@
 /*
  * @Author: Hey
  * @Date: 2021-01-29 16:52:08
- * @LastEditTime: 2021-02-02 14:36:50
+ * @LastEditTime: 2021-02-02 18:48:24
  * @LastEditors: Hey
  * @Description:
  * @FilePath: \vue-h5-template\src\utils\request.js
@@ -35,7 +35,7 @@ service.interceptors.request.use(
         forbidClick: true
       })
     }
-    config.headers['Authorization'] = getStroage("Token") || ''
+    config.headers['Authorization'] = getStroage('Token') || ''
     return config
   },
   error => {

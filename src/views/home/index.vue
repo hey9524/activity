@@ -1,7 +1,7 @@
 <!--
  * @Author: Hey
  * @Date: 2021-02-01 10:47:07
- * @LastEditTime: 2021-02-02 14:43:57
+ * @LastEditTime: 2021-02-02 18:45:20
  * @LastEditors: Hey
  * @Description:
  * @FilePath: \vue-h5-template\src\views\home\index.vue
@@ -9,12 +9,12 @@
 <template>
   <div class="index">
     <img src="@/assets/login/title.png" alt="" class="title">
+
     <van-notice-bar text="中奖人员XXX" />
-    <van-notice-bar :scrollable="false">
-      <van-swipe vertical class="notice-swipe" :autoplay="3000" :show-indicators="false">
-        <van-swipe-item v-for='item in list' :key="item.id">{{item.info}}</van-swipe-item>
-      </van-swipe>
-    </van-notice-bar>
+
+    <van-swipe vertical class="notice-swipe" :autoplay="1000" :show-indicators="false">
+      <van-swipe-item v-for='item in list' :key="item.id">{{item.info}}</van-swipe-item>
+    </van-swipe>
 
     <div class="content">
       <img v-for="item in contentList" :key="item.id" @click="jumpActive(item.id)" :src="item.img" alt=""
@@ -62,8 +62,19 @@
   import {
     videoComment,
     editUserInfo,
-    bulletChatList
+    bulletChatList,
+    getWinningList
   } from '@/api'
+
+  let userId = getStroage('Token') || ''
+
+  let socketUrl = 'http://120.53.235.197:8082' + "/imserver/" + userId;
+  socketUrl = socketUrl.replace("https", "ws").replace("http", "ws");
+  if (ws) {
+    ws.close();
+  }
+  const ws = new WebSocket(socketUrl)
+
   export default {
     data() {
       return {
@@ -103,48 +114,42 @@
         comment: '',
         show: false,
         pattern: /1[3-8]\d{8}/,
-        ws: null,
         userId: ''
       }
     },
     mounted() {
       this.show = this.$route.params.prize || false
-      this.userId = getStroage('Token') || ''
 
-      if (!this.userId) {
-        this.$roure.push('/login')
-        return
-      }
+      ws.addEventListener('open', this.handleWsOpen.bind(this), false)
+      ws.addEventListener('close', this.handleWsClose.bind(this), false)
+      ws.addEventListener('error', this.handleWsError.bind(this), false)
+      ws.addEventListener('message', this.handleWsMessage.bind(this), false)
 
-      let socketUrl = baseApi + "/imserver/" + this.userId;
-      socketUrl = socketUrl.replace("https", "ws").replace("http", "ws");
-      this.ws = new WebSocket(socketUrl)
-
-      this.ws.addEventListener('open', this.handleWsOpen.bind(this), false)
-      this.ws.addEventListener('close', this.handleWsClose.bind(this), false)
-      this.ws.addEventListener('error', this.handleWsError.bind(this), false)
-      this.ws.addEventListener('message', this.handleWsMessage.bind(this), false)
-
-      this.handleWsOpen()
       this.init()
+      this.getWinningList()
     },
     methods: {
+      async getWinningList() {
+        const {
+          data
+        } = await getWinningList()
+      },
       async init() {
-        const { data } = await bulletChatList()
-        console.log(data);
+        const {
+          data
+        } = await bulletChatList()
       },
       handleWsOpen(e) {
-        console.log('FE: WebSocket open');
-        console.log(this.ws);
+        console.log('BE: WebSocket open');
       },
       handleWsClose(e) {
-        console.log('FE: WebSocket close');
+        console.log('BE: WebSocket close');
       },
       handleWsError(e) {
-        console.log('FE: WebSocket error');
+        console.log('BE: WebSocket error');
       },
       handleWsMessage(e) {
-        console.log('FE: WebSocket message', e);
+        console.log('BE: WebSocket message', e);
       },
       jumpActive(id) {
         this.$router.push(`/activity/${id}`)
@@ -272,6 +277,14 @@
       margin-bottom: 8px;
     }
 
+    .notice-swipe {
+      width: 300px;
+      height: 120px;
+      background-color: #fffbe8;
+      line-height: 40px;
+      margin-top: 10px;
+    }
+
   }
 
 </style>
@@ -284,16 +297,19 @@
     margin-top: 10px;
   }
 
-  .notice-swipe {
-    height: 40px;
-    line-height: 40px;
-  }
-
   .van-dialog__content {
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 20px;
+  }
+
+  .van-swipe-item {
+    width: 300px;
+    height: 40px!important;
+    padding: 0 20px;
+    box-shadow: 0px 3px 5px 1px #ccc;
+    color: #ed6a0c;
   }
 
 </style>

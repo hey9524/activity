@@ -1,7 +1,7 @@
 <!--
  * @Author: Hey
  * @Date: 2021-02-01 12:35:39
- * @LastEditTime: 2021-02-02 11:48:23
+ * @LastEditTime: 2021-02-02 18:12:31
  * @LastEditors: Hey
  * @Description:
  * @FilePath: \vue-h5-template\src\views\home\activity.vue
@@ -16,7 +16,7 @@
     <div class="overlay">
       <van-swipe class="my-swipe" ref="swipe" @change="onChange" :touchable="false">
         <van-swipe-item v-for="item in movieList" :key="item.id">
-          <video class="movie" :src="item.videoUrl" controls="controls"></video>
+          <video class="movie" :src="item.videoUrl" controls="controls" :id="'video' + item.id"></video>
 
           <div class="content">
             <div>当前节目: <span class="content-info">{{item.videoName}}</span></div>
@@ -65,10 +65,17 @@
         this.movieList = data
       },
       onChange(index) {
+        console.log(index, 'index');
         this.activeId = index
       },
       changeSwipe(add) {
-        this.$refs.swipe[add ? 'next' : 'prev']()
+        console.log(this.activeId, 'activeId', `video${this.movieList[this.activeId].id}`);
+        const video = document.getElementById(`video${this.movieList[this.activeId].id}`)
+        video.pause()
+        let timer = setTimeout(() => {
+          this.$refs.swipe[add ? 'next' : 'prev']()
+          clearTimeout(timer)
+        }, 100)
       },
       // TODO...
       async vote() {
