@@ -10,11 +10,13 @@
   <div class="index">
     <img src="@/assets/login/title.png" alt="" class="title">
 
-    <van-notice-bar text="中奖人员XXX" />
+    <vue-seamless-scroll class="notice-swipe winning" :data="list" :class-option="transverseOption">
+      <span class="item" v-for='item in list' :key="item.id">{{item.info}}</span>
+    </vue-seamless-scroll>
 
-    <van-swipe vertical class="notice-swipe" :autoplay="1000" :show-indicators="false">
-      <van-swipe-item v-for='item in list' :key="item.id">{{item.info}}</van-swipe-item>
-    </van-swipe>
+    <vue-seamless-scroll class="notice-swipe" :data="list" :class-option="classOption">
+      <div class="item" v-for='item in list' :key="item.id">{{item.info}}</div>
+    </vue-seamless-scroll>
 
     <div class="content">
       <img v-for="item in contentList" :key="item.id" @click="jumpActive(item.id)" :src="item.img" alt=""
@@ -65,6 +67,7 @@
     bulletChatList,
     getWinningList
   } from '@/api'
+  import vueSeamlessScroll from 'vue-seamless-scroll'
 
   let userId = getStroage('Token') || ''
 
@@ -76,6 +79,10 @@
   const ws = new WebSocket(socketUrl)
 
   export default {
+    name: 'Index',
+    components: {
+      vueSeamlessScroll
+    },
     data() {
       return {
         list: [{
@@ -127,6 +134,28 @@
 
       this.init()
       this.getWinningList()
+    },
+    computed: {
+      classOption() {
+        return {
+          step: 0.2, // 数值越大速度滚动越快
+          limitMoveNum: 2, // 开始无缝滚动的数据量 this.dataList.length
+          hoverStop: true, // 是否开启鼠标悬停stop
+          direction: 1, // 0向下 1向上 2向左 3向右
+          openWatch: true, // 开启数据实时监控刷新dom
+          singleHeight: 0, // 单步运动停止的高度(默认值0是无缝不停止的滚动) direction => 0/1
+          singleWidth: 0, // 单步运动停止的宽度(默认值0是无缝不停止的滚动) direction => 2/3
+          waitTime: 1000 // 单步运动停止的时间(默认值1000ms)
+        }
+      },
+      transverseOption() {
+        return {
+          step: 0.2, // 数值越大速度滚动越快
+          limitMoveNum: this.list.length, // 开始无缝滚动的数据量 this.dataList.length
+          hoverStop: true, // 是否开启鼠标悬停stop
+          direction: 2, // 0向下 1向上 2向左 3向右
+        }
+      }
     },
     methods: {
       async getWinningList() {
@@ -283,6 +312,17 @@
       background-color: #fffbe8;
       line-height: 40px;
       margin-top: 10px;
+      overflow: hidden;
+      padding: 0 20px;
+    }
+
+    .winning {
+      height: 40px;
+
+      .item {
+        display: inline-block;
+        padding: 0 20px;
+      }
     }
 
   }
@@ -302,14 +342,6 @@
     flex-direction: column;
     align-items: center;
     padding: 20px;
-  }
-
-  .van-swipe-item {
-    width: 300px;
-    height: 40px!important;
-    padding: 0 20px;
-    box-shadow: 0px 3px 5px 1px #ccc;
-    color: #ed6a0c;
   }
 
 </style>
