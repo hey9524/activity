@@ -1,7 +1,7 @@
 /*
  * @Author: Hey
  * @Date: 2021-01-29 16:52:08
- * @LastEditTime: 2021-02-01 17:35:44
+ * @LastEditTime: 2021-02-02 18:48:24
  * @LastEditors: Hey
  * @Description:
  * @FilePath: \vue-h5-template\src\utils\request.js
@@ -19,7 +19,6 @@ import {
   getStroage
 } from './stroage'
 // create an axios instance
-const Authorization = getStroage()
 const service = axios.create({
   baseURL: baseApi, // url = base api url + request url
   withCredentials: true, // send cookies when cross-domain requests
@@ -36,15 +35,12 @@ service.interceptors.request.use(
         forbidClick: true
       })
     }
-    config.headers['Authorization'] = Authorization || ''
+    config.headers['Authorization'] = getStroage('Token') || ''
     return config
   },
   error => {
     // do something with request error
-    Notify({
-      type: 'error',
-      message: res || '访问错误,请稍后重试'
-    })
+    Notify('访问错误,请稍后重试')
     console.log(error) // for debug
     return Promise.reject(error)
   }
@@ -56,10 +52,7 @@ service.interceptors.response.use(
     const res = response.data
     if (res.status && res.status !== 200) {
       // 登录超时,重新登录
-      Notify({
-        type: 'error',
-        message: res || '访问错误,请稍后重试'
-      })
+      Notify(res.msg || '访问错误,请稍后重试')
       return Promise.reject(res || 'error')
     } else {
       return Promise.resolve(res)
@@ -67,6 +60,7 @@ service.interceptors.response.use(
   },
   error => {
     Toast.clear()
+    Notify('访问错误,请稍后重试')
     console.log('err' + error) // for debug
     return Promise.reject(error)
   }

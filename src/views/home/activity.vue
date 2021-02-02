@@ -1,7 +1,7 @@
 <!--
  * @Author: Hey
  * @Date: 2021-02-01 12:35:39
- * @LastEditTime: 2021-02-01 16:30:16
+ * @LastEditTime: 2021-02-02 18:12:31
  * @LastEditors: Hey
  * @Description:
  * @FilePath: \vue-h5-template\src\views\home\activity.vue
@@ -16,12 +16,14 @@
     <div class="overlay">
       <van-swipe class="my-swipe" ref="swipe" @change="onChange" :touchable="false">
         <van-swipe-item v-for="item in movieList" :key="item.id">
-          <video class="movie" src="@/assets/c483e086785aed9a794ad651beb3057f.mp4" controls="controls"></video>
+          <video class="movie" :src="item.videoUrl" controls="controls" :id="'video' + item.id"></video>
+
           <div class="content">
-            <div>当前节目: <span class="content-info">{{item.title}}</span></div>
+            <div>当前节目: <span class="content-info">{{item.videoName}}</span></div>
             <div>当前票数: <span class="content-info">{{item.ticket}}</span></div>
           </div>
         </van-swipe-item>
+
         <template #indicator>
           <div class="custom-indicator">
             <img @click="changeSwipe()" src="@/assets/prev.png" alt="" class="prev">
@@ -35,51 +37,67 @@
 </template>
 
 <script>
-export default {
-  data() {
-    return {
-      routeId: 1,
-      movieList: [{
-        inner: 1,
-        title: '肖申克的救赎',
-        ticket: 1,
-        id: 1
-      },
-      {
-        inner: 2,
-        title: 1,
-        ticket: 1,
-        id: 2
-      },
-      {
-        inner: 3,
-        title: 1,
-        ticket: 1,
-        id: 3
+  import {
+    getVideoList,
+    videoVote
+  } from '@/api'
+  export default {
+    data() {
+      return {
+        routeId: 1,
+        movieList: [],
+        activeId: 0,
+        queryArray: ['满', '堂', '红']
       }
-      ],
-      activeId: 0
-    }
-  },
-  mounted() {
-    this.routeId = this.$route.params.id || 1
-    this.init()
-  },
-  methods: {
-    // TODO..
-    async init() {},
-    onChange(index) {
-      this.activeId = index
     },
-    changeSwipe(add) {
-      this.$refs.swipe[add ? 'next' : 'prev']()
+    mounted() {
+      this.routeId = this.$route.params.id || 1
+      this.init()
     },
-    // TODO...
-    vote() {
-      console.log(this.activeId)
+    methods: {
+      // TODO..
+      async init() {
+        const {
+          data
+        } = await getVideoList({
+          videoType: this.queryArray[this.routeId]
+        })
+        this.movieList = data
+      },
+      onChange(index) {
+        console.log(index, 'index');
+        this.activeId = index
+      },
+      changeSwipe(add) {
+        console.log(this.activeId, 'activeId', `video${this.movieList[this.activeId].id}`);
+        const video = document.getElementById(`video${this.movieList[this.activeId].id}`)
+        video.pause()
+        let timer = setTimeout(() => {
+          this.$refs.swipe[add ? 'next' : 'prev']()
+          clearTimeout(timer)
+        }, 100)
+      },
+      // TODO...
+      async vote() {
+        const {
+          movieList,
+          activeId
+        } = this
+        const {
+          msg,
+          success
+        } = await videoVote(movieList[activeId].id)
+
+        this.$notify(success ? {
+          type: 'success',
+          message: '投票成功'
+        } : {
+          type: 'warning',
+          message: msg
+        })
+      }
     }
   }
-}
 
 </script>
 <style lang="scss" scoped>
@@ -114,8 +132,8 @@ export default {
       .my-swipe {
         position: relative;
         width: 375px;
-        height: 280px;
-        padding: 20px 0 10px;
+        height: 260px;
+        padding: 0 0 10px;
 
         .movie {
           width: 255px;
@@ -127,13 +145,13 @@ export default {
           justify-content: space-between;
           align-items: center;
           width: 255px;
-          font-size: 16px;
+          font-size: 14px;
           font-weight: 1000;
           color: #a31420;
           margin-top: 20px;
 
           &-info {
-            font-size: 14px;
+            font-size: 12px;
           }
         }
 
