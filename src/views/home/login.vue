@@ -1,7 +1,7 @@
 <!--
  * @Author: Hey
  * @Date: 2021-01-29 16:52:08
- * @LastEditTime: 2021-02-01 17:44:18
+ * @LastEditTime: 2021-02-02 11:24:58
  * @LastEditors: Hey
  * @Description:
  * @FilePath: \vue-h5-template\src\views\home\login.vue
@@ -19,6 +19,9 @@
   import {
     login
   } from '@/api'
+  import {
+    setStroage
+  } from '@/utils/stroage'
   export default {
     data() {
       return {
@@ -56,12 +59,20 @@
           message: '请填写密码后访问'
         })
         const {
-          data
+          data,
+          code
         } = await login({
           key
         })
-        console.log(data)
-        // this.$router.push('/')
+        if (code === 200 && data) {
+          setStroage('Token', data.token)
+          this.$router.push({
+            name: 'Index',
+            params: {
+              prize: data.prize
+            }
+          })
+        }
       }
     }
   }

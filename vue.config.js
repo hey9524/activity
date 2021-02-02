@@ -51,17 +51,18 @@ module.exports = {
       warnings: false,
       errors: true
     },
-    // proxy: {
-    //   // 配置跨域
-    //   '/api': {
-    //     target: 'http://120.53.235.197:8082',
-    //     ws:true,
-    //     changOrigin: true,
-    //     pathRewrite: {
-    //       '^/api': '/'
-    //     }
-    //   }
-    // }
+      proxy: {
+        // 配置跨域
+        '/api': {
+          target: 'http://120.53.235.197:8082/api',
+          ws:true,
+          // secure: false,
+          changOrigin: true,
+          pathRewrite: {
+            '^/api': '/'
+          }
+        }
+      }
   },
   css: {
     extract: IS_PROD, // 是否将组件中的 CSS 提取至一个独立的 CSS 文件中 (而不是动态注入到 JavaScript 中的 inline 代码)。
@@ -128,11 +129,9 @@ module.exports = {
      * 打包分析
      */
     if (IS_PROD) {
-      config.plugin('webpack-report').use(BundleAnalyzerPlugin, [
-        {
-          analyzerMode: 'static'
-        }
-      ])
+      config.plugin('webpack-report').use(BundleAnalyzerPlugin, [{
+        analyzerMode: 'static'
+      }])
     }
     config
       // https://webpack.js.org/configuration/devtool/#development
@@ -142,12 +141,10 @@ module.exports = {
       config
         .plugin('ScriptExtHtmlWebpackPlugin')
         .after('html')
-        .use('script-ext-html-webpack-plugin', [
-          {
-            // 将 runtime 作为内联引入不单独存在
-            inline: /runtime\..*\.js$/
-          }
-        ])
+        .use('script-ext-html-webpack-plugin', [{
+          // 将 runtime 作为内联引入不单独存在
+          inline: /runtime\..*\.js$/
+        }])
         .end()
       config.optimization.splitChunks({
         chunks: 'all',

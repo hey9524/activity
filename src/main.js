@@ -1,3 +1,11 @@
+/*
+ * @Author: Hey
+ * @Date: 2021-01-29 16:52:08
+ * @LastEditTime: 2021-02-02 12:42:48
+ * @LastEditors: Hey
+ * @Description: 
+ * @FilePath: \vue-h5-template\src\main.js
+ */
 // 兼容 IE
 // https://github.com/zloirock/core-js/blob/master/docs/2019-03-19-core-js-3-babel-and-a-look-into-the-future.md#babelpolyfill
 import 'core-js/stable'
@@ -7,9 +15,14 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+import {
+  getStroage
+} from './utils/stroage'
 
 // 设置 js中可以访问 $cdn
-import { $cdn } from '@/config'
+import {
+  $cdn
+} from '@/config'
 Vue.prototype.$cdn = $cdn
 
 // 全局引入按需引入UI库 vant
@@ -28,4 +41,14 @@ new Vue({
   router,
   store,
   render: h => h(App)
+});
+
+
+router.beforeEach((to, from, next) => {
+  let token = getStroage('Token')
+  if (token) {
+    to.path === '/login' ? next('/') : next()
+  } else {
+    to.path === '/login' ? next() : next('/login')
+  }
 })
