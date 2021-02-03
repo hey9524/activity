@@ -1,37 +1,18 @@
 <template>
   <div class="video-player">
+    <!-- style="object-fit:fill" -->
     <!-- 播放器界面; 兼容ios  controls-->
-    <video
-ref="video"
-v-if="showVideo"
-webkit-playsinline="true"
-playsinline="true"
-x-webkit-airplay="true"
-      x5-video-player-type="h5"
-x5-video-player-fullscreen="true"
-x5-video-orientation="portraint"
-      style="object-fit:fill"
-preload="auto"
-:src="src"
-@waiting="handleWaiting"
-type="video/mp4"
-      @canplaythrough="state.isLoading = false"
+    <video ref="video" v-if="showVideo" webkit-playsinline="true" playsinline="true" x-webkit-airplay="true"
+      x5-video-player-type="h5" x5-video-player-fullscreen="true" x5-video-orientation="portraint" preload="auto"
+      :src="src" @waiting="handleWaiting" type="video/mp4" @canplaythrough="state.isLoading = false"
       @playing="state.isLoading = false, state.controlBtnShow = false, state.playing=true"
-      @stalled="state.isLoading = true"
-@error="handleError">您的浏览器不支持HTML5</video>
+      @stalled="state.isLoading = true" @error="handleError">您的浏览器不支持HTML5</video>
 
     <!-- 兼容Android端层级问题, 弹出层被覆盖 -->
-    <img
-v-show="!showVideo || state.isEnd"
-class="poster"
-src="https://photo.mac69.com/180205/18020526/a9yPQozt0g.jpg"
+    <img v-show="!showVideo || state.isEnd" class="poster" src="https://photo.mac69.com/180205/18020526/a9yPQozt0g.jpg"
       alt>
     <!-- 控制窗口 -->
-    <div
-class="control"
-v-show="!state.isError"
-ref="control"
-@touchstart="touchEnterVideo"
+    <div class="control" v-show="!state.isError" ref="control" @touchstart="touchEnterVideo"
       @touchend="touchLeaveVideo">
       <!-- 播放 || 暂停 || 加载中-->
       <div class="play" @touchstart.stop="clickPlayBtn" v-show="state.controlBtnShow">
@@ -48,16 +29,11 @@ ref="control"
       <div class="control-bar" :style="{ visibility: state.controlBarShow ? 'visible' : 'hidden'}">
         <span class="time">{{video.displayTime}}</span>
         <span class="progress" ref="progress">
-          <img
-class="progress-btn ignore"
-:style="{transform: `translate3d(${video.progress.current}px, 0, 0)`}"
+          <img class="progress-btn ignore" :style="{transform: `translate3d(${video.progress.current}px, 0, 0)`}"
             src="@/assets/video/content_ic_tutu.svg">
           <span class="progress-loaded" :style="{ width: `${video.loaded}%`}"></span>
           <!-- 设置手动移动的进度条 -->
-          <span
-class="progress-move"
-@touchmove.stop.prevent="moveIng($event)"
-@touchstart.stop="moveStart($event)"
+          <span class="progress-move" @touchmove.stop.prevent="moveIng($event)" @touchstart.stop="moveStart($event)"
             @touchend.stop="moveEnd($event)"></span>
         </span>
 
@@ -75,259 +51,264 @@ class="progress-move"
   </div>
 </template>
 <script>
-import {
-  throttle
-} from '@/utils'
-const pad = val => {
-  val = Math.floor(val)
-  if (val < 10) {
-    return '0' + val
+  import {
+    throttle
+  } from '@/utils'
+  const pad = val => {
+    val = Math.floor(val)
+    if (val < 10) {
+      return '0' + val
+    }
+    return val + ''
   }
-  return val + ''
-}
-const timeParse = sec => {
-  let min = 0
-  min = Math.floor(sec / 60)
-  sec = sec - min * 60
-  return pad(min) + ':' + pad(sec)
-}
-export default {
-  name: 'TVideo',
-  props: {
-    src: {
-      type: String,
-      required: true
-    },
-    showVideo: {
-      // 兼容android弹出层
-      type: Boolean,
-      default: true
-    },
-    isPaused: {
-      type: Boolean,
-      default: true
-    }
-  },
-  data() {
-    return {
-      // video元素
-      $video: null,
-      // 视频容器元素
-      player: {
-        $player: null,
-        pos: null
+  const timeParse = sec => {
+    let min = 0
+    min = Math.floor(sec / 60)
+    sec = sec - min * 60
+    return pad(min) + ':' + pad(sec)
+  }
+  export default {
+    name: 'TVideo',
+    props: {
+      src: {
+        type: String,
+        required: true
       },
-      // progress进度条元素
-      progressBar: {
-        $progress: null, // 进度条DOM对象
-        pos: null
+      showVideo: {
+        // 兼容android弹出层
+        type: Boolean,
+        default: true
       },
-      // video控制显示设置
-      video: {
-        loaded: 0, // 缓存长度
-        displayTime: '00:00', // 进度时间
-        totalTime: '00:00', // 总时间
-        progress: {
-          width: 0, // 进度条长度
-          current: 0 // 进度条当前位置
-        }
-      },
-      // 定时器
-      hideTimer: null,
-      // 播放状态控制
-      state: {
-        controlBtnShow: true, // 播放按钮
-        controlBarShow: false, // 控制条
-        fullScreen: false,
-        playing: false,
-        isLoading: false,
-        isEnd: false,
-        isError: false
-      },
-      // 首次触摸
-      isFirstTouch: true,
-      // 暂停状态触摸
-      isPauseTouch: false
-    }
-  },
-  methods: {
-    init() {
-      // 初始化video,获取video元素
-      this.$video = this.$el.getElementsByTagName('video')[0]
-      this.initPlayer()
+      isPaused: {
+        type: Boolean,
+        default: true
+      }
     },
-    // 初始化播放器容器, 获取video-player元素
-    // getBoundingClientRect()以client可视区的左上角为基点进行位置计算
-    initPlayer() {
-      const $player = this.$el
-      const $progress = this.$el.getElementsByClassName('progress')[0]
-      // 播放器位置
-      this.player.$player = $player
-      this.progressBar.$progress = $progress
-      this.player.pos = $player.getBoundingClientRect()
-      this.progressBar.pos = $progress.getBoundingClientRect()
-      this.video.progress.width = Math.round($progress.getBoundingClientRect().width)
+    data() {
+      return {
+        // video元素
+        $video: null,
+        // 视频容器元素
+        player: {
+          $player: null,
+          pos: null
+        },
+        // progress进度条元素
+        progressBar: {
+          $progress: null, // 进度条DOM对象
+          pos: null
+        },
+        // video控制显示设置
+        video: {
+          loaded: 0, // 缓存长度
+          displayTime: '00:00', // 进度时间
+          totalTime: '00:00', // 总时间
+          progress: {
+            width: 0, // 进度条长度
+            current: 0 // 进度条当前位置
+          }
+        },
+        // 定时器
+        hideTimer: null,
+        // 播放状态控制
+        state: {
+          controlBtnShow: true, // 播放按钮
+          controlBarShow: false, // 控制条
+          fullScreen: false,
+          playing: false,
+          isLoading: false,
+          isEnd: false,
+          isError: false
+        },
+        // 首次触摸
+        isFirstTouch: true,
+        // 暂停状态触摸
+        isPauseTouch: false
+      }
     },
-    // 点击播放 & 暂停按钮
-    clickPlayBtn() {
-      if (this.state.isLoading) return
-      this.isFirstTouch = false
-      this.state.playing = !this.state.playing
-      this.state.isEnd = false
-      if (this.$video) {
-        // 播放状态
-        if (this.state.playing) {
-          try {
-            this.$video.play()
-            this.isPauseTouch = false
-            // 监听缓存进度
-            this.$video.addEventListener('progress', e => {
-              this.getLoadTime()
-            })
-            // 监听播放进度
-            this.$video.addEventListener(
-              'timeupdate',
-              throttle(this.getPlayTime, 100, 1)
-            )
-            // 监听结束
-            this.$video.addEventListener('ended', e => {
-              // 重置状态
-              this.state.playing = false
-              this.state.isEnd = true
-              this.state.controlBtnShow = true
-              this.video.displayTime = '00:00'
-              this.video.progress.current = 0
-              this.$video.currentTime = 0
-              this.src = this.src
-            })
-          } catch (e) {
-            // 捕获url异常出现的错误
+    methods: {
+      init() {
+        // 初始化video,获取video元素
+        this.$video = this.$el.getElementsByTagName('video')[0]
+        this.initPlayer()
+      },
+      // 初始化播放器容器, 获取video-player元素
+      // getBoundingClientRect()以client可视区的左上角为基点进行位置计算
+      initPlayer() {
+        const $player = this.$el
+        const $progress = this.$el.getElementsByClassName('progress')[0]
+        // 播放器位置
+        this.player.$player = $player
+        this.progressBar.$progress = $progress
+        this.player.pos = $player.getBoundingClientRect()
+        this.progressBar.pos = $progress.getBoundingClientRect()
+        this.video.progress.width = Math.round($progress.getBoundingClientRect().width)
+      },
+      // 点击播放 & 暂停按钮
+      clickPlayBtn() {
+        if (this.state.isLoading) return
+        this.isFirstTouch = false
+        this.state.playing = !this.state.playing
+        this.state.isEnd = false
+        if (this.$video) {
+          // 播放状态
+          if (this.state.playing) {
+            try {
+              this.$video.play()
+              setTimeout(() => {
+                this.$video.pause()
+                this.$video.play()
+              }, 10)
+              this.isPauseTouch = false
+              // 监听缓存进度
+              this.$video.addEventListener('progress', e => {
+                this.getLoadTime()
+              })
+              // 监听播放进度
+              this.$video.addEventListener(
+                'timeupdate',
+                throttle(this.getPlayTime, 100, 1)
+              )
+              // 监听结束
+              this.$video.addEventListener('ended', e => {
+                // 重置状态
+                this.state.playing = false
+                this.state.isEnd = true
+                this.state.controlBtnShow = true
+                this.video.displayTime = '00:00'
+                this.video.progress.current = 0
+                this.$video.currentTime = 0
+                this.src = this.src
+              })
+            } catch (e) {
+              // 捕获url异常出现的错误
+              console.log('videoErr', e);
+            }
+          }
+          // 停止状态
+          else {
+            this.isPauseTouch = true
+            this.$video.pause()
           }
         }
-        // 停止状态
-        else {
-          this.isPauseTouch = true
-          this.$video.pause()
+      },
+      // 触碰播放区
+      touchEnterVideo() {
+        if (this.isFirstTouch) return
+        if (this.hideTimer) {
+          clearTimeout(this.hideTimer)
+          this.hideTimer = null
         }
-      }
-    },
-    // 触碰播放区
-    touchEnterVideo() {
-      if (this.isFirstTouch) return
-      if (this.hideTimer) {
-        clearTimeout(this.hideTimer)
-        this.hideTimer = null
-      }
-      this.state.controlBtnShow = true
-      this.state.controlBarShow = true
-    },
-    // 离开播放区
-    touchLeaveVideo() {
-      if (this.isFirstTouch) return
-      if (this.hideTimer) {
-        clearTimeout(this.hideTimer)
-      }
-      // 暂停触摸, 不隐藏
-      if (this.isPauseTouch) {
         this.state.controlBtnShow = true
         this.state.controlBarShow = true
-      } else {
-        this.hideTimer = setTimeout(() => {
-          this.state.controlBarShow = false
-          // 加载中只显示loading
-          if (this.state.isLoading) {
-            this.state.controlBtnShow = true
-          } else {
-            this.state.controlBtnShow = false
-          }
-          this.hideTimer = null
-        }, 3000)
-      }
-    },
-    // 等待数据加载
-    handleWaiting() {
-      this.state.controlBtnShow = true
-      this.state.isLoading = true
-    },
-    // 数据加载出错
-    handleError() {
-      this.state.isError = true
-    },
-    // 点击重新加载
-    retry() {
-      this.state.isError = false
-      this.init()
-    },
-    // 获取播放时间
-    getPlayTime() {
-      const percent = this.$video.currentTime / this.$video.duration
-      this.video.progress.current = Math.round(
-        this.video.progress.width * percent
-      )
-      // 赋值时长
-      this.video.totalTime = timeParse(this.$video.duration)
-      this.video.displayTime = timeParse(this.$video.currentTime)
-    },
-    // 获取缓存时间
-    getLoadTime() {
-      // console.log('缓存了...',this.$video.buffered.end(0));
-      this.video.loaded =
+      },
+      // 离开播放区
+      touchLeaveVideo() {
+        if (this.isFirstTouch) return
+        if (this.hideTimer) {
+          clearTimeout(this.hideTimer)
+        }
+        // 暂停触摸, 不隐藏
+        if (this.isPauseTouch) {
+          this.state.controlBtnShow = true
+          this.state.controlBarShow = true
+        } else {
+          this.hideTimer = setTimeout(() => {
+            this.state.controlBarShow = false
+            // 加载中只显示loading
+            if (this.state.isLoading) {
+              this.state.controlBtnShow = true
+            } else {
+              this.state.controlBtnShow = false
+            }
+            this.hideTimer = null
+          }, 3000)
+        }
+      },
+      // 等待数据加载
+      handleWaiting() {
+        this.state.controlBtnShow = true
+        this.state.isLoading = true
+      },
+      // 数据加载出错
+      handleError() {
+        this.state.isError = true
+      },
+      // 点击重新加载
+      retry() {
+        this.state.isError = false
+        this.init()
+      },
+      // 获取播放时间
+      getPlayTime() {
+        const percent = this.$video.currentTime / this.$video.duration
+        this.video.progress.current = Math.round(
+          this.video.progress.width * percent
+        )
+        // 赋值时长
+        this.video.totalTime = timeParse(this.$video.duration)
+        this.video.displayTime = timeParse(this.$video.currentTime)
+      },
+      // 获取缓存时间
+      getLoadTime() {
+        // console.log('缓存了...',this.$video.buffered.end(0));
+        this.video.loaded =
           (this.$video.buffered.end(0) / this.$video.duration) * 100
-    },
-    // 手动调节播放进度
-    moveStart(e) {},
-    moveIng(e) {
-      // console.log("触摸中...");
-      const currentX = e.targetTouches[0].pageX
-      let offsetX = currentX - this.progressBar.pos.left
-      // 边界检测
-      if (offsetX <= 0) {
-        offsetX = 0
-      }
-      if (offsetX >= this.video.progress.width) {
-        offsetX = this.video.progress.width
-      }
-      this.video.progress.current = offsetX
+      },
+      // 手动调节播放进度
+      moveStart(e) {},
+      moveIng(e) {
+        // console.log("触摸中...");
+        const currentX = e.targetTouches[0].pageX
+        let offsetX = currentX - this.progressBar.pos.left
+        // 边界检测
+        if (offsetX <= 0) {
+          offsetX = 0
+        }
+        if (offsetX >= this.video.progress.width) {
+          offsetX = this.video.progress.width
+        }
+        this.video.progress.current = offsetX
 
-      const percent = this.video.progress.current / this.video.progress.width
-      this.$video.duration && this.setPlayTime(percent, this.$video.duration)
-    },
-    moveEnd(e) {
-      // console.log("触摸结束...");
-      const currentX = e.changedTouches[0].pageX
-      const offsetX = currentX - this.progressBar.pos.left
-      this.video.progress.current = offsetX
-      // 这里的offsetX都是正数
-      const percent = offsetX / this.video.progress.width
-      this.$video.duration && this.setPlayTime(percent, this.$video.duration)
-    },
-    // 设置手动播放时间
-    setPlayTime(percent, totalTime) {
-      this.$video.currentTime = Math.floor(percent * totalTime)
-    },
-    // 设置全屏
-    fullScreen() {
-      console.log('点击全屏...')
-      if (!this.state.fullScreen) {
-        this.state.fullScreen = true
-        this.$video.webkitRequestFullScreen()
-      } else {
-        this.state.fullScreen = false
-        document.webkitCancelFullScreen()
+        const percent = this.video.progress.current / this.video.progress.width
+        this.$video.duration && this.setPlayTime(percent, this.$video.duration)
+      },
+      moveEnd(e) {
+        // console.log("触摸结束...");
+        const currentX = e.changedTouches[0].pageX
+        const offsetX = currentX - this.progressBar.pos.left
+        this.video.progress.current = offsetX
+        // 这里的offsetX都是正数
+        const percent = offsetX / this.video.progress.width
+        this.$video.duration && this.setPlayTime(percent, this.$video.duration)
+      },
+      // 设置手动播放时间
+      setPlayTime(percent, totalTime) {
+        this.$video.currentTime = Math.floor(percent * totalTime)
+      },
+      // 设置全屏
+      fullScreen() {
+        console.log('点击全屏...')
+        if (!this.state.fullScreen) {
+          this.state.fullScreen = true
+          this.$video.webkitRequestFullScreen()
+        } else {
+          this.state.fullScreen = false
+          document.webkitCancelFullScreen()
+        }
       }
+    },
+    watch: {
+      isPaused(newVal, oldVal) {
+        if (newVal === oldVal) return
+        this.state.playing = true
+        this.clickPlayBtn()
+      }
+    },
+    mounted() {
+      this.$nextTick(() => this.init())
     }
-  },
-  watch: {
-    isPaused(newVal, oldVal) {
-      if (newVal === oldVal) return
-      this.state.playing = true
-      this.clickPlayBtn()
-    }
-  },
-  mounted() {
-    this.$nextTick(() => this.init())
   }
-}
 
 </script>
 <style lang='scss' scoped>
@@ -400,11 +381,11 @@ export default {
 
     // 控制层
     .control {
-      width: 100%;
+      width: calc(100% - 20px);
       height: 100%;
       position: absolute;
       z-index: 100;
-      left: 0;
+      left: 10px;
       top: 0;
       background-color: transparent;
 
@@ -432,6 +413,7 @@ export default {
         height: 26px;
         display: flex;
         align-items: center;
+        width: 100%;
 
         span {
           font-size: 12px;

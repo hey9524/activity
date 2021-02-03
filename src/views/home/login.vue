@@ -87,9 +87,9 @@
     }
 
     .movie {
-      width: calc(100vw - 60px);
+      width: calc(100vw - 20px);
       height: 188px;
-      background-color: #999;
+      background-color: #000;
       border-radius: 10px 10px 0 0;
       margin: 20px 0;
     }

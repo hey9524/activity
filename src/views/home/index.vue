@@ -41,7 +41,7 @@
 
     <img src="@/assets/index/comments.png" alt="" class="comments" @click="commentsHandle">
 
-    <img src="@/assets/index/jiemu-2.jpg" alt="" class="jiemu">
+    <img src="@/assets/index/jiemu-2.png" alt="" class="jiemu">
 
     <van-dialog v-model="show" @close='clear' :show-confirm-button="false">
       <div class="dialog">
@@ -113,13 +113,18 @@
         show: false,
         pattern: /1[3-8]\d{8}/,
         userId: '',
-        selfWinInfo: {}
+        selfWinInfo: {},
+        socketTimer: null
       }
     },
     mounted() {
       this.init()
       this.getWinningList()
       this.websocket()
+      this.socketTimer = setInterval(() => this.handleWsSend({
+        data: "data",
+        key: "PING"
+      }), 30000)
     },
     computed: {
       classOption() {
@@ -161,6 +166,9 @@
         } = await bulletChatList()
         this.commentsList = data.records
       },
+      handleWsSend(data) {
+        this.socket.send(JSON.stringify(data))
+      },
       handleWsOpen(e) {
         console.log('BE: WebSocket open')
       },
@@ -175,16 +183,23 @@
         const info = this.formatCheck(e.data) && JSON.parse(e.data)
         if (!info) return
         console.log(info);
+        // 弹幕
         if (info.key === 'COMMENT') {
-          if (info.data.nickname) this.list.push(info.data)
+          // if (info.data.nickname) this.list.push(info.data)
           this.commentsList.push(info.data)
+          // 当前用户中奖
         } else if (info.key === 'WIN_PRIZE') {
+          // 未填写用户信息
           if (info.data.phone == '') {
             this.show = true
             this.selfWinInfo = info.data
             return
           }
+          this.commentsList.push(info.data)
           this.list.push(info.data)
+          // 重刷中奖列表
+        } else if (info.key === 'PULL_PRIZE') {
+          this.getWinningList()
         }
       },
       formatCheck(str) {
@@ -295,6 +310,7 @@
     },
     beforeDestroy() {
       this.socket.onclose()
+      clearInterval(this.socketTimer)
     }
   }
 
@@ -305,7 +321,6 @@
     flex-direction: column;
     align-items: center;
     width: 100vw;
-    padding-bottom: 60px;
     background-image: url('~@/assets/index/bg.jpg');
     background-size: cover;
     background-repeat: no-repeat;

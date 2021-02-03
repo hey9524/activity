@@ -42,72 +42,72 @@
 </template>
 
 <script>
-import {
-  getVideoList,
-  videoVote
-} from '@/api'
-import videoCom from '@/components/videoCom'
-export default {
-  components: {
-    videoCom
-  },
-  data() {
-    return {
-      routeId: 1,
-      movieList: [],
-      activeId: 0,
-      queryArray: ['满', '堂', '红'],
-      isPaused: true
-    }
-  },
-  mounted() {
-    'onorientationchange' in window && window.addEventListener('onorientationchange', this.resize)
+  import {
+    getVideoList,
+    videoVote
+  } from '@/api'
+  import videoCom from '@/components/videoCom'
+  export default {
+    components: {
+      videoCom
+    },
+    data() {
+      return {
+        routeId: 1,
+        movieList: [],
+        activeId: 0,
+        queryArray: ['满', '堂', '红'],
+        isPaused: true
+      }
+    },
+    mounted() {
+      'onorientationchange' in window && window.addEventListener('onorientationchange', this.resize)
 
-    this.routeId = this.$route.params.id || 1
-    this.init()
-  },
-  methods: {
-    resize() {
-      this.$refs.swipe.resize()
+      this.routeId = this.$route.params.id || 1
+      this.init()
     },
-    // TODO..
-    async init() {
-      const {
-        data
-      } = await getVideoList({
-        videoType: this.queryArray[this.routeId]
-      })
-      this.movieList = data
-    },
-    onChange(index) {
-      this.activeId = index
-      this.isPaused = !this.isPaused
-    },
-    changeSwipe(add) {
-      // const video = document.getElementById(`video${this.movieList[this.activeId].id}`)
-      // video.pause()
-      this.$refs.swipe[add ? 'next' : 'prev']()
-    },
-    async vote() {
-      const {
-        movieList,
-        activeId
-      } = this
-      const {
-        msg,
-        success
-      } = await videoVote(movieList[activeId].id)
+    methods: {
+      resize() {
+        this.$refs.swipe.resize()
+      },
+      // TODO..
+      async init() {
+        const {
+          data
+        } = await getVideoList({
+          videoType: this.queryArray[this.routeId]
+        })
+        this.movieList = data
+      },
+      onChange(index) {
+        this.activeId = index
+        this.isPaused = !this.isPaused
+      },
+      changeSwipe(add) {
+        // const video = document.getElementById(`video${this.movieList[this.activeId].id}`)
+        // video.pause()
+        this.$refs.swipe[add ? 'next' : 'prev']()
+      },
+      async vote() {
+        const {
+          movieList,
+          activeId
+        } = this
+        const {
+          msg,
+          success
+        } = await videoVote(movieList[activeId].id)
 
-      this.$notify(success ? {
-        type: 'success',
-        message: '投票成功'
-      } : {
-        type: 'warning',
-        message: msg
-      })
+        this.$notify(success ? {
+          type: 'success',
+          message: '投票成功'
+        } : {
+          type: 'warning',
+          message: msg
+        })
+      }
     }
   }
-}
 
 </script>
 <style lang="scss" scoped>
@@ -151,7 +151,7 @@ export default {
           transform: translate(-50%, 10px);
           width: calc(100vw - 60px);
           height: 188px;
-          background-color: #999;
+          background-color: #000;
           border-radius: 10px 10px 0 0;
           z-index: 10;
         }
