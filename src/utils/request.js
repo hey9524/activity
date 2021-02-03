@@ -1,7 +1,7 @@
 /*
  * @Author: Hey
  * @Date: 2021-01-29 16:52:08
- * @LastEditTime: 2021-02-02 18:48:24
+ * @LastEditTime: 2021-02-03 16:21:17
  * @LastEditors: Hey
  * @Description:
  * @FilePath: \vue-h5-template\src\utils\request.js
@@ -16,8 +16,10 @@ import {
   baseApi
 } from '@/config'
 import {
-  getStroage
+  getStroage,
+  removeStroage
 } from './stroage'
+import router from '@/router'
 // create an axios instance
 const service = axios.create({
   baseURL: baseApi, // url = base api url + request url
@@ -52,15 +54,21 @@ service.interceptors.response.use(
     const res = response.data
     if (res.status && res.status !== 200) {
       // 登录超时,重新登录
-      Notify(res.msg || '访问错误,请稍后重试')
+      Notify(response.msg || '访问错误,请稍后重试')
+      removeStroage('Token')
+      router.replace('/login')
       return Promise.reject(res || 'error')
     } else {
+      if (res.code !== 200) {
+        Notify(res.msg || '访问错误,请稍后重试')
+      }
       return Promise.resolve(res)
     }
   },
   error => {
     Toast.clear()
-    Notify('访问错误,请稍后重试')
+    removeStroage('Token')
+    router.replace('/login')
     console.log('err' + error) // for debug
     return Promise.reject(error)
   }

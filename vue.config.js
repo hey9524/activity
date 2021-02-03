@@ -5,7 +5,7 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 
 const resolve = dir => path.join(__dirname, dir)
 // page title
-const name = defaultSettings.title || 'vue mobile template'
+const name = defaultSettings.title || '新年线上活动'
 // 生产环境，测试和正式
 const IS_PROD = ['production', 'prod'].includes(process.env.NODE_ENV)
 // externals
@@ -45,24 +45,24 @@ module.exports = {
   productionSourceMap: false, // 如果你不需要生产环境的 source map，可以将其设置为 false 以加速生产环境构建。
   devServer: {
     port: 9028, // 端口
-    open: true, // 启动后打开浏览器
+    open: false, // 启动后打开浏览器
     overlay: {
       //  当出现编译器错误或警告时，在浏览器中显示全屏覆盖层
       warnings: false,
       errors: true
     },
-      proxy: {
-        // 配置跨域
-        '/api': {
-          target: 'http://120.53.235.197:8082/',
-          ws:true,
-          // secure: false,
-          changOrigin: true,
-          // pathRewrite: {
-          //   '^/api': '/'
-          // }
-        }
+    proxy: {
+      // 配置跨域
+      '/api': {
+        target: 'http://120.53.235.197:8082',
+        ws: true,
+        // secure: false,
+        changOrigin: true
+        // pathRewrite: {
+        //   '^/api': '/'
+        // }
       }
+    }
   },
   css: {
     extract: IS_PROD, // 是否将组件中的 CSS 提取至一个独立的 CSS 文件中 (而不是动态注入到 JavaScript 中的 inline 代码)。

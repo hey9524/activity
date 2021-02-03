@@ -1,9 +1,9 @@
 /*
  * @Author: Hey
  * @Date: 2021-01-29 16:52:08
- * @LastEditTime: 2021-02-02 17:33:03
+ * @LastEditTime: 2021-02-03 16:51:12
  * @LastEditors: Hey
- * @Description: 
+ * @Description:
  * @FilePath: \vue-h5-template\src\api\home.js
  */
 // axios
@@ -31,7 +31,7 @@ export function videoVote(key) {
 // 获取弹幕列表
 export function bulletChatList(params = {
   pageIndex: 1,
-  pageSize: 10
+  pageSize: 10000
 }) {
   return request({
     url: `/api/fr-video-comment/bulletChat`,
@@ -54,7 +54,7 @@ export function videoComment(params) {
 // 获取中奖列表
 export function getWinningList(params = {
   pageIndex: 1,
-  pageSize: 10
+  pageSize: 1000
 }) {
   return request({
     url: `/api/fr-user-prize/list`,

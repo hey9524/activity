@@ -1,7 +1,7 @@
 <!--
  * @Author: Hey
  * @Date: 2021-01-29 16:52:08
- * @LastEditTime: 2021-02-02 11:24:58
+ * @LastEditTime: 2021-02-03 21:14:20
  * @LastEditors: Hey
  * @Description:
  * @FilePath: \vue-h5-template\src\views\home\login.vue
@@ -10,12 +10,18 @@
 <template>
   <div class="index">
     <img src="@/assets/login/title.png" alt="" class="title">
+
+    <div class="movie">
+      <videoCom :src="src" />
+    </div>
+
     <img src="@/assets/login/inputlabel.png" alt="" class="label">
     <input type="text" v-model="key" class="pass-inp">
     <img src="@/assets/login/loginBTN.png" alt="" class="btn" @click="login">
   </div>
 </template>
 <script>
+  import videoCom from '@/components/videoCom'
   import {
     login
   } from '@/api'
@@ -23,28 +29,14 @@
     setStroage
   } from '@/utils/stroage'
   export default {
+    components: {
+      videoCom
+    },
     data() {
       return {
-        key: '满堂红',
-        list: [
-          'Vue-cli4',
-          '配置多环境变量',
-          'VantUI 组件按需加载',
-          'Sass 全局样式',
-          'Webpack 4',
-          'Vuex 状态管理',
-          'Axios 封装及接口管理',
-          'Vue-router',
-          'Webpack 4 vue.config.js 基础配置',
-          '配置 proxy 跨域',
-          '配置 alias 别名',
-          '配置 打包分析',
-          '配置 externals 引入 cdn 资源',
-          '去掉 console.log',
-          'splitChunks 单独打包第三方模块',
-          '添加 IE 兼容',
-          'Eslint+Pettier 统一开发规范'
-        ]
+        // key: '满堂红',
+        key: '',
+        src: window.videoUrl || ''
       }
     },
     mounted() {},
@@ -54,10 +46,12 @@
         const {
           key
         } = this
-        if (!key) return this.$notify({
-          type: 'warning',
-          message: '请填写密码后访问'
-        })
+        if (!key) {
+          return this.$notify({
+            type: 'warning',
+            message: '请填写密码后访问'
+          })
+        }
         const {
           data,
           code
@@ -67,10 +61,7 @@
         if (code === 200 && data) {
           setStroage('Token', data.token)
           this.$router.push({
-            name: 'Index',
-            params: {
-              prize: data.prize
-            }
+            name: 'Index'
           })
         }
       }
@@ -83,10 +74,11 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 375px;
-    height: 100vh;
+    width: 100vw;
+    min-height: 100vh;
+    padding: 20px 0;
     background-image: url('~@/assets/login/backgroundIMG.jpg');
-    background-size: 375px 100vh;
+    background-size: cover;
     background-repeat: no-repeat;
 
     .title {
@@ -94,13 +86,20 @@
       width: 318px;
     }
 
+    .movie {
+      width: calc(100vw - 60px);
+      height: 188px;
+      background-color: #999;
+      border-radius: 10px 10px 0 0;
+      margin: 20px 0;
+    }
+
     .label {
-      margin-top: 10vh;
       width: 40vw;
     }
 
     .pass-inp {
-      width: 80vw;
+      width: 300px;
       height: 40px;
       border-radius: 10px;
       background-color: #fff;
