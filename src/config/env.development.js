@@ -1,7 +1,7 @@
 /*
  * @Author: Hey
  * @Date: 2021-01-29 16:52:08
- * @LastEditTime: 2021-02-02 18:49:46
+ * @LastEditTime: 2021-02-03 11:23:25
  * @LastEditors: Hey
  * @Description: 
  * @FilePath: \vue-h5-template\src\config\env.development.js
@@ -14,5 +14,6 @@ module.exports = {
   baseApi: '', // 本地api请求地址,注意：如果你使用了代理，请设置成'/'
   APPID: 'xxx',
   APPSECRET: 'xxx',
-  $cdn: 'https://www.sunniejs.cn/static'
+  $cdn: 'https://www.sunniejs.cn/static',
+  ws: ''
 }

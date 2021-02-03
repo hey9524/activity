@@ -1,9 +1,9 @@
 /*
  * @Author: Hey
  * @Date: 2021-01-29 16:52:08
- * @LastEditTime: 2021-02-02 12:42:48
+ * @LastEditTime: 2021-02-03 15:25:19
  * @LastEditors: Hey
- * @Description: 
+ * @Description:
  * @FilePath: \vue-h5-template\src\main.js
  */
 // 兼容 IE
@@ -41,11 +41,10 @@ new Vue({
   router,
   store,
   render: h => h(App)
-});
-
+})
 
 router.beforeEach((to, from, next) => {
-  let token = getStroage('Token')
+  const token = getStroage('Token')
   if (token) {
     to.path === '/login' ? next('/') : next()
   } else {

@@ -1,7 +1,7 @@
 <!--
  * @Author: Hey
  * @Date: 2021-02-01 12:35:39
- * @LastEditTime: 2021-02-02 18:12:31
+ * @LastEditTime: 2021-02-03 17:19:50
  * @LastEditors: Hey
  * @Description:
  * @FilePath: \vue-h5-template\src\views\home\activity.vue
@@ -14,24 +14,29 @@
     <div class="call">请选择为哪个节目打call</div>
 
     <div class="overlay">
-      <van-swipe class="my-swipe" ref="swipe" @change="onChange" :touchable="false">
-        <van-swipe-item v-for="item in movieList" :key="item.id">
-          <video class="movie" :src="item.videoUrl" controls="controls" :id="'video' + item.id"></video>
+      <van-swipe class="my-swipe" ref="swipe" @change="onChange" :touchable="false" :show-indicators='false'>
+        <van-swipe-item v-for="(item, i) in movieList" :key="item.id" lazy-render>
+
+          <!-- <video ref='video' class="movie" playsinline webkit-playsinline x5-playsinline autobuffer='autobuffer'
+            x5-video-player-type='true' controls="controls" :id="'video' + item.id">
+            <source v-if="activeId == i" src='http://192.168.0.114:8080/redio/getVido' type="video/mp4" />
+            <source v-if="activeId == i" :src='item.videoUrl' type="video/mp4" />
+          </video> -->
+          <div class="movie">
+            <videoCom :src="item.videoUrl" />
+          </div>
 
           <div class="content">
             <div>当前节目: <span class="content-info">{{item.videoName}}</span></div>
             <div>当前票数: <span class="content-info">{{item.ticket}}</span></div>
           </div>
         </van-swipe-item>
-
-        <template #indicator>
-          <div class="custom-indicator">
-            <img @click="changeSwipe()" src="@/assets/prev.png" alt="" class="prev">
-            <img @click="changeSwipe(true)" src="@/assets/next.png" alt="" class="next">
-          </div>
-        </template>
       </van-swipe>
+
+      <img @click.prevent="changeSwipe()" src="@/assets/prev.png" alt="" class="prev">
+      <img @click="changeSwipe(true)" src="@/assets/next.png" alt="" class="next">
     </div>
+
     <div @click="vote" class="btn">我要为节目助力投票</div>
   </div>
 </template>
@@ -41,20 +46,39 @@
     getVideoList,
     videoVote
   } from '@/api'
+  import videoCom from '@/components/videoCom'
   export default {
+    components: {
+      videoCom
+    },
     data() {
       return {
         routeId: 1,
         movieList: [],
         activeId: 0,
-        queryArray: ['满', '堂', '红']
+        queryArray: ['满', '堂', '红'],
+        options: {
+          preload: true,
+          useH5Prism: true,
+          playsinline: true,
+          controlBarVisibility: 'click',
+          definition: 'FD,LD,SD',
+          defaultDefinition: 'FD'
+        }
       }
     },
     mounted() {
+      var evt = "onorientationchange" in window ? "orientationchange" : "resize";
+
+      window.addEventListener(evt, this.resize);
+
       this.routeId = this.$route.params.id || 1
       this.init()
     },
     methods: {
+      resize() {
+        this.$refs.swipe.resize()
+      },
       // TODO..
       async init() {
         const {
@@ -65,17 +89,12 @@
         this.movieList = data
       },
       onChange(index) {
-        console.log(index, 'index');
         this.activeId = index
       },
       changeSwipe(add) {
-        console.log(this.activeId, 'activeId', `video${this.movieList[this.activeId].id}`);
-        const video = document.getElementById(`video${this.movieList[this.activeId].id}`)
-        video.pause()
-        let timer = setTimeout(() => {
-          this.$refs.swipe[add ? 'next' : 'prev']()
-          clearTimeout(timer)
-        }, 100)
+        // const video = document.getElementById(`video${this.movieList[this.activeId].id}`)
+        // video.pause()
+        this.$refs.swipe[add ? 'next' : 'prev']()
       },
       // TODO...
       async vote() {
@@ -123,24 +142,34 @@
     }
 
     .overlay {
+      position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
-      width: 100%;
+      width: 100vw;
       background-color: rgba(255, 255, 255, .5);
 
       .my-swipe {
-        position: relative;
-        width: 375px;
+        width: 100vw;
         height: 260px;
-        padding: 0 0 10px;
+        padding: 10px 0;
 
         .movie {
-          width: 255px;
-          height: 200px;
+          position: absolute;
+          left: 50%;
+          transform: translate(-50%, 10px);
+          width: calc(100vw - 60px);
+          height: 188px;
+          background-color: #999;
+          border-radius: 10px 10px 0 0;
+          z-index: 10;
         }
 
         .content {
+          position: absolute;
+          left: 50%;
+          transform: translate(-50%, 0);
+          bottom: 20px;
           display: flex;
           justify-content: space-between;
           align-items: center;
@@ -154,21 +183,22 @@
             font-size: 12px;
           }
         }
+      }
 
-        .custom-indicator {
-          position: absolute;
-          top: 50%;
-          transform: translateY(calc(-50% - 20px));
-          display: flex;
-          justify-content: space-between;
-          width: 375px;
-          padding: 0 10px;
+      .prev,
+      .next {
+        position: absolute;
+        top: 50%;
+        transform: translateY(calc(-50% - 20px));
+        width: 15px;
+      }
 
-          .prev,
-          .next {
-            width: 30px;
-          }
-        }
+      .prev {
+        left: 10px;
+      }
+
+      .next {
+        right: 10px;
       }
     }
 
@@ -178,16 +208,6 @@
       color: #fbdcb2;
       margin-top: 20px;
     }
-  }
-
-</style>
-<style lang="scss">
-  .van-swipe-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 375px !important;
-    height: 250px !important;
   }
 
 </style>
