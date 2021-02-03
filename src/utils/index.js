@@ -103,10 +103,10 @@ export function param2Obj(url) {
   return JSON.parse(
     '{"' +
     decodeURIComponent(search)
-    .replace(/"/g, '\\"')
-    .replace(/&/g, '","')
-    .replace(/=/g, '":"')
-    .replace(/\+/g, ' ') +
+      .replace(/"/g, '\\"')
+      .replace(/&/g, '","')
+      .replace(/=/g, '":"')
+      .replace(/\+/g, ' ') +
     '"}'
   )
 }
@@ -123,22 +123,22 @@ export const getLanguage = () => {
  * @param immediate true 表立即执行，false 表非立即执行
  */
 export const debounce = (func, wait, immediate) => {
-  let timeout;
-  return function () {
-    let context = this;
-    let args = arguments;
+  let timeout
+  return function() {
+    const context = this
+    const args = arguments
 
-    if (timeout) clearTimeout(timeout);
+    if (timeout) clearTimeout(timeout)
     if (immediate) {
-      let callNow = !timeout;
+      const callNow = !timeout
       timeout = setTimeout(() => {
-        timeout = null;
+        timeout = null
       }, wait)
       if (callNow) func.apply(context, args)
     } else {
       timeout = setTimeout(() => {
         func.apply(context, args)
-      }, wait);
+      }, wait)
     }
   }
 }
@@ -151,24 +151,24 @@ export const debounce = (func, wait, immediate) => {
  */
 export const throttle = (func, wait, type) => {
   if (type === 1) {
-    var previous = 0;
+    var previous = 0
   } else if (type === 2) {
-    var timeout;
+    var timeout
   }
-  return function () {
-    let context = this;
-    let args = arguments;
+  return function() {
+    const context = this
+    const args = arguments
     if (type === 1) {
-      let now = Date.now();
+      const now = Date.now()
 
       if (now - previous > wait) {
-        func.apply(context, args);
-        previous = now;
+        func.apply(context, args)
+        previous = now
       }
     } else if (type === 2) {
       if (!timeout) {
         timeout = setTimeout(() => {
-          timeout = null;
+          timeout = null
           func.apply(context, args)
         }, wait)
       }
