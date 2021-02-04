@@ -1,7 +1,7 @@
 /*
  * @Author: Hey
  * @Date: 2021-01-29 16:52:08
- * @LastEditTime: 2021-02-03 16:21:17
+ * @LastEditTime: 2021-02-04 11:28:08
  * @LastEditors: Hey
  * @Description:
  * @FilePath: \vue-h5-template\src\utils\request.js
@@ -17,6 +17,7 @@ import {
 } from '@/config'
 import {
   getStroage,
+  getLoginStroage,
   removeStroage
 } from './stroage'
 import router from '@/router'
@@ -37,7 +38,8 @@ service.interceptors.request.use(
         forbidClick: true
       })
     }
-    config.headers['Authorization'] = getStroage('Token') || ''
+    config.headers['Authorization'] = /login/i.test(config.url) ? getLoginStroage('Token') || '' : getStroage('Token') || ''
+
     return config
   },
   error => {
@@ -69,7 +71,7 @@ service.interceptors.response.use(
     Toast.clear()
     removeStroage('Token')
     router.replace('/login')
-    console.log('err' + error) // for debug
+    console.log('err:  ' + error) // for debug
     return Promise.reject(error)
   }
 )

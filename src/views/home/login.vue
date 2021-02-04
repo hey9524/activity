@@ -1,7 +1,7 @@
 <!--
  * @Author: Hey
  * @Date: 2021-01-29 16:52:08
- * @LastEditTime: 2021-02-03 21:14:20
+ * @LastEditTime: 2021-02-04 15:57:48
  * @LastEditors: Hey
  * @Description:
  * @FilePath: \vue-h5-template\src\views\home\login.vue
@@ -26,7 +26,8 @@
     login
   } from '@/api'
   import {
-    setStroage
+    setStroage,
+    setLoginStroage
   } from '@/utils/stroage'
   export default {
     components: {
@@ -41,7 +42,6 @@
     },
     mounted() {},
     methods: {
-      // TODO...
       async login() {
         const {
           key
@@ -60,6 +60,7 @@
         })
         if (code === 200 && data) {
           setStroage('Token', data.token)
+          setLoginStroage('Token', data.token)
           this.$router.push({
             name: 'Index'
           })
