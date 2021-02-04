@@ -1,7 +1,7 @@
 <!--
  * @Author: Hey
  * @Date: 2021-02-01 12:35:39
- * @LastEditTime: 2021-02-03 18:09:23
+ * @LastEditTime: 2021-02-04 15:57:56
  * @LastEditors: Hey
  * @Description:
  * @FilePath: \vue-h5-template\src\views\home\activity.vue
@@ -70,7 +70,6 @@
       resize() {
         this.$refs.swipe.resize()
       },
-      // TODO..
       async init() {
         const {
           data
@@ -106,7 +105,10 @@
           message: msg
         })
       }
-    }
+    },
+    beforeDestroy() {
+      window.removeEventListener('orientationchange')
+    },
   }
 
 </script>

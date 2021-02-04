@@ -1,7 +1,7 @@
 <!--
  * @Author: Hey
  * @Date: 2021-02-01 10:47:07
- * @LastEditTime: 2021-02-03 21:09:47
+ * @LastEditTime: 2021-02-04 16:40:48
  * @LastEditors: Hey
  * @Description:
  * @FilePath: \vue-h5-template\src\views\home\index.vue
@@ -29,12 +29,9 @@
 
     <div class="rule">
       <div>评论奖励规则：</div>
-      <div>
-        1.每逢88楼获得1次幸运奖，如188、1288等，奖品为牛年玩偶一个；</div>
-      <div>
-        2.第2021楼获得“满堂红“奖，奖励价值1000元无线耳机一个；</div>
-      <div>
-        3.评论上限为1万条。</div>
+      <div>1.每逢35楼获得1次幸运奖，如135、1235等，奖品为牛年主题玩偶或蓝宝主题玩偶一个；</div>
+      <div>2.第1135楼获得“满堂红“奖，奖励价值1000元无线耳机一个；</div>
+      <div>3.评论上限为1万条。</div>
     </div>
 
     <van-field autosize type="textarea" v-model="comment" placeholder="评论区" class="textarea"></van-field>
@@ -215,7 +212,6 @@
       jumpActive(id) {
         this.$router.push(`/activity/${id}`)
       },
-      // TODO
       async commentsHandle() {
         const {
           comment
@@ -243,7 +239,6 @@
 
         this.comment = ''
       },
-      // TODO...提交身份信息
       async onSubmit(val) {
         const {
           form,
@@ -285,13 +280,10 @@
           alert('您的浏览器不支持socket')
         } else {
           if (this.socket) {
-            console.log('hassocket')
             this.socket.close()
-            this.socket = null
           }
           // 实例化socket
           this.socket = new WebSocket(socketUrl)
-          console.log(this.socket, 'socket')
           // 监听socket连接
           this.socket.onopen = this.handleWsOpen
           // 监听socket错误信息
@@ -309,7 +301,7 @@
       next()
     },
     beforeDestroy() {
-      this.socket.onclose()
+      this.socket.close()
       clearInterval(this.socketTimer)
     }
   }

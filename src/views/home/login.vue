@@ -1,7 +1,7 @@
 <!--
  * @Author: Hey
  * @Date: 2021-01-29 16:52:08
- * @LastEditTime: 2021-02-04 11:03:04
+ * @LastEditTime: 2021-02-04 15:57:48
  * @LastEditors: Hey
  * @Description:
  * @FilePath: \vue-h5-template\src\views\home\login.vue
@@ -42,7 +42,6 @@
     },
     mounted() {},
     methods: {
-      // TODO...
       async login() {
         const {
           key
