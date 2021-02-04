@@ -1,10 +1,10 @@
 <template>
   <div class="video-player">
-    <!-- style="object-fit:fill" -->
+    <!-- style="object-fit:fill"  x5-video-player-type="h5" webkit-playsinline="true"-->
     <!-- 播放器界面; 兼容ios  controls-->
-    <video ref="video" v-if="showVideo" webkit-playsinline="true" playsinline="true" x-webkit-airplay="true"
-      x5-video-player-type="h5" x5-video-player-fullscreen="true" x5-video-orientation="portraint" preload="auto"
-      :src="src" @waiting="handleWaiting" type="video/mp4" @canplaythrough="state.isLoading = false"
+    <video ref="video" v-if="showVideo" poster='' x5-video-player-type="h5" webkit-playsinline="true" :playsinline="playsinline" x-webkit-airplay="allow"
+      x5-video-player-fullscreen="true" x5-video-orientation="landscape" preload="auto" :src="src"
+      @waiting="handleWaiting" type="video/mp4" @canplaythrough="state.isLoading = false"
       @playing="state.isLoading = false, state.controlBtnShow = false, state.playing=true"
       @stalled="state.isLoading = true" @error="handleError">您的浏览器不支持HTML5</video>
 
@@ -38,7 +38,7 @@
         </span>
 
         <span class="total-time">{{video.totalTime}}</span>
-        <span class="full-screen" @click="fullScreen">
+        <span class="full-screen" @click="fullScreen($event)">
           <img src="@/assets/video/content_ic_increase.svg" alt>
         </span>
       </div>
@@ -287,14 +287,46 @@
         this.$video.currentTime = Math.floor(percent * totalTime)
       },
       // 设置全屏
-      fullScreen() {
-        console.log('点击全屏...')
+      fullScreen(e) {
         if (!this.state.fullScreen) {
           this.state.fullScreen = true
-          this.$video.webkitRequestFullScreen()
+
+          if (this.$video.webkitRequestFullscreen) { // 兼容X5
+            this.$video.webkitRequestFullscreen();
+          } else if (this.$video.webkitEnterFullScreen) { // 兼容safari
+            this.$video.webkitEnterFullScreen();
+          } else if (this.$video.requestFullscreen) {
+            this.$video.requestFullscreen();
+          } else if (this.$video.msRequestFullscreen) {
+            this.$video.msRequestFullscreen();
+          } else if (this.$video.mozRequestFullScreen) {
+            this.$video.mozRequestFullScreen();
+          } else {
+            this.$notify('当前手机暂不支持全屏')
+          }
         } else {
           this.state.fullScreen = false
-          document.webkitCancelFullScreen()
+          if (document.webkitCancelFullScreen) {
+            document.webkitCancelFullScreen();
+          } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+          } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+          } else if (document.exitFullscreen) {
+            document.exitFullscreen();
+          }
+        }
+      }
+    },
+    computed: {
+      playsinline() {
+        var ua = navigator.userAgent.toLocaleLowerCase();
+        //x5内核
+        if (ua.match(/tencenttraveler/) != null || ua.match(/qqbrowse/) != null) {
+          return false
+        } else {
+          //ios端
+          return true
         }
       }
     },
@@ -381,11 +413,11 @@
 
     // 控制层
     .control {
-      width: calc(100% - 20px);
+      width: calc(100% - 30px);
       height: 100%;
       position: absolute;
       z-index: 100;
-      left: 10px;
+      left: 15px;
       top: 0;
       background-color: transparent;
 
@@ -425,7 +457,7 @@
         .progress {
           position: relative;
           margin: 0 8px;
-          width: 203px;
+          width: calc(100% - 38px);
           height: 2px;
           background: rgba(255, 255, 255, 0.4);
           border-radius: 2px;
