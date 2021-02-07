@@ -7,7 +7,7 @@
  * @FilePath: \vue-h5-template\src\api\home.js
  */
 // axios
-import request from '@/utils/request'
+import request from '@/utils/instance'
 
 // 根据类型获取视频列表
 export function getVideoList(params) {

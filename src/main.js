@@ -43,11 +43,11 @@ new Vue({
   render: h => h(App)
 })
 
-router.beforeEach((to, from, next) => {
-  const token = getStroage('Token')
-  if (token) {
-    to.path === '/login' ? next('/') : next()
-  } else {
-    to.path === '/login' ? next() : next('/login')
-  }
-})
+// router.beforeEach((to, from, next) => {
+//   const token = getStroage('Token')
+//   if (token) {
+//     to.path === '/login' ? next('/') : next()
+//   } else {
+//     to.path === '/login' ? next() : next('/login')
+//   }
+// })

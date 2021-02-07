@@ -11,30 +11,39 @@
  * @type { *[] }
  */
 export const constantRouterMap = [{
-  path: '/',
-  name: 'Index',
-  component: () => import('@/views/home/index'),
-  meta: {
-    title: '首页',
-    keepAlive: false
-  }
-}, {
-  path: '/login',
-  name: 'Login',
-  component: () => import('@/views/home/login'),
-  meta: {
-    title: '登录',
-    keepAlive: false
-  }
-}, {
-  path: '/activity/:id',
-  name: 'Activity',
-  component: () => import('@/views/home/activity'),
-  meta: {
-    title: '活动',
-    keepAlive: false
-  }
-}
+    path: '/',
+    name: 'Index',
+    component: () => import('@/views/home/index'),
+    meta: {
+      title: '首页',
+      keepAlive: false
+    }
+  }, {
+    path: '/reload',
+    name: 'Reload',
+    component: () => import('@/views/home/reload'),
+    meta: {
+      title: '首页',
+      keepAlive: false
+    }
+  },
+  // {
+  //   path: '/login',
+  //   name: 'Login',
+  //   component: () => import('@/views/home/login'),
+  //   meta: {
+  //     title: '登录',
+  //     keepAlive: false
+  //   }
+  // }, {
+  //   path: '/activity/:id',
+  //   name: 'Activity',
+  //   component: () => import('@/views/home/activity'),
+  //   meta: {
+  //     title: '活动',
+  //     keepAlive: false
+  //   }
+  // }
   // {
   //   path: '/about',
   //   name: 'About',

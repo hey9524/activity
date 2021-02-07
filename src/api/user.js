@@ -7,7 +7,7 @@
  * @FilePath: \vue-h5-template\src\api\user.js
  */
 // axios
-import request from '@/utils/request'
+import request from '@/utils/instance'
 
 // 登录
 export function login(params) {

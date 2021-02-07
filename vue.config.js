@@ -54,7 +54,7 @@ module.exports = {
     proxy: {
       // 配置跨域
       '/api': {
-        target: 'http://120.53.235.197:8082',
+        target: 'http://120.53.235.197:8083',
         ws: true,
         // secure: false,
         changOrigin: true

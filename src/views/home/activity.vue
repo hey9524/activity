@@ -107,7 +107,7 @@
       }
     },
     beforeDestroy() {
-      window.removeEventListener('orientationchange')
+      window.removeEventListener('orientationchange', this.resize)
     },
   }
 
