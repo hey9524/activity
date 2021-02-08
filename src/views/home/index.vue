@@ -8,7 +8,7 @@
 -->
 <template>
   <div class="index">
-    <!-- <img src="@/assets/login/title.png" alt="" class="title"> -->
+    <img src="@/assets/index/indexBg.png" alt="" class="title">
 
     <!-- <vue-seamless-scroll class="notice-swipe winning" :data="list" :class-option="transverseOption"> -->
     <!-- </vue-seamless-scroll> -->
@@ -394,16 +394,15 @@
     align-items: center;
     width: 100vw;
     min-height: 100vh;
-    padding: 220px 0 40px;
-    background-image: url('~@/assets/index/indexBgI.jpg');
+    padding-bottom: 40px;
+    // background-image: url('~@/assets/index/indexBgI.jpg');
+    background-image: linear-gradient(to right, #810412, #c80118, #810412);
     background-size: cover;
     background-repeat: no-repeat;
 
     .title {
-      width: 318px;
-      margin: 70px 0 20px;
+      width: 100vw;
     }
-    // #810412  #c80118
 
     .overlay {
       position: relative;
