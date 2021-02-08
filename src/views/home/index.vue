@@ -394,7 +394,8 @@
     align-items: center;
     width: 100vw;
     min-height: 100vh;
-    background-image: url('~@/assets/index/bg.jpg');
+    padding: 220px 0 40px;
+    background-image: url('~@/assets/index/indexBgI.jpg');
     background-size: cover;
     background-repeat: no-repeat;
 
@@ -402,6 +403,7 @@
       width: 318px;
       margin: 70px 0 20px;
     }
+    // #810412  #c80118
 
     .overlay {
       position: relative;
