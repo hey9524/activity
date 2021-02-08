@@ -13,7 +13,10 @@
     <!-- <vue-seamless-scroll class="notice-swipe winning" :data="list" :class-option="transverseOption"> -->
     <!-- </vue-seamless-scroll> -->
     <van-notice-bar class="notice-swipe winning" scrollable>
-      <span class="item" v-for='(item, i) in list' :key="i">{{`恭喜${item.nickname}获得${item.floor || i}楼奖励`}}</span>
+      <div v-if="!list.length">多多留言，下一个获奖的就是你。</div>
+      <div v-else>
+        <span class="item" v-for='(item, i) in list' :key="i">{{`恭喜${item.nickname}获得${item.floor || i}楼奖励`}}</span>
+      </div>
     </van-notice-bar>
 
     <vue-seamless-scroll class="notice-swipe" :data="commentsList" :class-option="classOption">
