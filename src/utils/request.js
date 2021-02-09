@@ -38,7 +38,7 @@ service.interceptors.request.use(
         forbidClick: true
       })
     }
-    config.headers['Authorization'] = /login/i.test(config.url) ? getLoginStroage('Token') || '' : getStroage('Token') || ''
+    config.headers['Authorization'] = /login/i.test(config.url) ? getLoginStroage('Token') || getStroage('Token') || '' : getStroage('Token') || ''
 
     return config
   },

@@ -15,5 +15,6 @@ module.exports = {
   APPID: 'xxx',
   APPSECRET: 'xxx',
   $cdn: 'https://www.sunniejs.cn/static',
-  ws: ''
+  ws: '',
+  targetUri: 'http://192.168.0.112:8082'
 }

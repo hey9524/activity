@@ -54,7 +54,7 @@ module.exports = {
     proxy: {
       // 配置跨域
       '/api': {
-        target: 'http://192.168.0.112:8082',
+        target: defaultSettings.targetUri,
         ws: true,
         // secure: false,
         changOrigin: true
