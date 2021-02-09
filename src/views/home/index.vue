@@ -37,7 +37,8 @@
       <div>3.评论上限为1万条。</div>
     </div>
 
-    <van-field autosize type="textarea" v-model="comment" placeholder="评论区" class="textarea"></van-field>
+    <van-field :disabled='commentsList[commentsList.length - 1] && commentsList[commentsList.length - 1].floor >= 10000'
+      autosize type="textarea" v-model="comment" placeholder="评论区" class="textarea"></van-field>
 
     <img src="@/assets/index/comments.png" alt="" class="comments" @click="commentsHandle">
 
@@ -79,7 +80,8 @@
     videoComment,
     editUserInfo,
     bulletChatList,
-    getWinningList
+    getWinningList,
+    login
   } from '@/api'
   import vueSeamlessScroll from 'vue-seamless-scroll'
 
@@ -121,6 +123,7 @@
       this.init()
       this.getWinningList()
       this.websocket()
+      this.selfPrizeHandle()
       this.socketTimer = setInterval(() => this.handleWsSend({
         data: "data",
         key: "PING"
@@ -154,6 +157,14 @@
       }
     },
     methods: {
+      async selfPrizeHandle() {
+        const {
+          data
+        } = await login({
+          key: '满堂红'
+        })
+        if (data.prize) this.show = true
+      },
       async getWinningList() {
         const {
           data
@@ -164,7 +175,7 @@
         const {
           data
         } = await bulletChatList()
-        this.commentsList = data.records
+        this.commentsList = data.records.reverse()
       },
       handleWsSend(data) {
         this.socket.send(JSON.stringify(data))
@@ -186,7 +197,7 @@
         // 弹幕
         if (info.key === 'COMMENT') {
           // if (info.data.nickname) this.list.push(info.data)
-          this.commentsList.push(info.data)
+          this.commentsList.unshift(info.data)
           // 当前用户中奖
         } else if (info.key === 'WIN_PRIZE') {
           // 未填写用户信息
@@ -195,7 +206,7 @@
             this.selfWinInfo = info.data
             return
           }
-          this.commentsList.push(info.data)
+          this.commentsList.unshift(info.data)
           this.list.push(info.data)
           // 重刷中奖列表
         } else if (info.key === 'PULL_PRIZE') {
@@ -217,14 +228,18 @@
       },
       async commentsHandle() {
         const {
-          comment
+          comment,
+          commentsList
         } = this
-        if (!comment) {
-          return this.$notify({
+        if (commentsList[commentsList.length - 1] && commentsList[commentsList.length - 1].floor >= 10000) return this
+          .$notify({
             type: 'warning',
-            message: '请输入内容后提交'
+            message: '评论上限为1万条'
           })
-        }
+        if (!comment) return this.$notify({
+          type: 'warning',
+          message: '请输入内容后提交'
+        })
         const {
           msg,
           success
@@ -259,11 +274,14 @@
           type: 'warning',
           message: msg
         })
-        this.list.push({
-          ...selfWinInfo,
-          ...form
-        })
-        console.log('winList', this.list);
+        let timer = setTimeout(() => {
+          this.getWinningList()
+          clearTimeout(timer)
+        }, 200)
+        // this.list.push({
+        //   ...selfWinInfo,
+        //   ...form
+        // })
 
         this.show = false
       },
