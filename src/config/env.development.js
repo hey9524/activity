@@ -15,5 +15,6 @@ module.exports = {
   APPID: 'xxx',
   APPSECRET: 'xxx',
   $cdn: 'https://www.sunniejs.cn/static',
-  ws: ''
+  ws: '',
+  targetUri: 'http://120.53.235.197:8082', // proxy拦截地址
 }

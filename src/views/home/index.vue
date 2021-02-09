@@ -68,6 +68,7 @@
     <div class="comments1" @click="commentsHandle">评论</div>
 
     <!-- <img src="@/assets/index/jiemu-2.png" alt="" class="jiemu"> -->
+    <img src="@/assets/index/bottomImg.png" alt="" class="jiemu">
 
     <van-dialog v-model="show" @close='clear' :show-confirm-button="false">
       <div class="dialog">
@@ -395,7 +396,7 @@
     align-items: center;
     width: 100vw;
     min-height: 100vh;
-    padding-bottom: 40px;
+    // padding-bottom: 40px;
     // background-image: url('~@/assets/index/indexBgI.jpg');
     background-image: linear-gradient(to right, #810412, #c80118, #810412);
     background-size: cover;
@@ -561,6 +562,7 @@
 
     .jiemu {
       width: 100vw;
+      margin-top: 20px;
     }
 
     .winning {
