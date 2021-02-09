@@ -20,9 +20,9 @@ const instance = axios.create({
 
 // 请求拦截器
 instance.interceptors.request.use(config => {
-  if (getStroage('Token')) {
-    config.headers.Authorization = getStroage('Token')
-  }
+  // if (getStroage('Token')) {
+  config.headers.Authorization = getStroage('Token') || ''
+  // }
   Toast.loading({
     forbidClick: true
   })
@@ -63,51 +63,51 @@ instance.interceptors.response.use(response => {
   if (error.response) {
     switch (error.response.status) {
       case 401:
-        if (getStroage('Token')) {
-          var config = error.response.config;
-          console.log("token过期");
-          //通过刷新token获取请求token
-          if (!isRefreshing) {
-            isRefreshing = true;
-            return instance({
-                url: "/api/login/app", // 后台接口
-                method: "post", // 请求方式  
-                params: {
-                  key: '满堂红',
-                }
-              })
-              .then(response => {
-                newToken = response.data.token
-                //未进行刷新
-                setStroage('Token', newToken)
+        // if (getStroage('Token')) {
+        var config = error.response.config;
+        console.log("token过期");
+        //通过刷新token获取请求token
+        if (!isRefreshing) {
+          isRefreshing = true;
+          return instance({
+              url: "/api/login/app", // 后台接口
+              method: "post", // 请求方式  
+              params: {
+                key: '满堂红',
+              }
+            })
+            .then(response => {
+              newToken = response.data.token
+              //未进行刷新
+              setStroage('Token', newToken)
 
-                return instance(config);
-              })
-              .catch(error => {
-                console.log("刷新token请求失败:", error);
-              }).finally(() => {
-                isRefreshing = false;
-                requests.forEach(cb => cb(newToken));
-                // 重试完了别忘了清空这个队列（掘金评论区同学指点）
-                requests = [];
-              })
-          } else {
-            // 正在刷新token，返回一个未执行resolve的promise
-            return new Promise((resolve) => {
-              // 将resolve放进队列，用一个函数形式来保存，等token刷新后直接执行
-              requests.push((token) => {
-                config.headers.Authorization = token
-                resolve(instance(config))
-              });
-            });
-          }
+              return instance(config);
+            })
+            .catch(error => {
+              console.log("刷新token请求失败:", error);
+            }).finally(() => {
+              isRefreshing = false;
+              requests.forEach(cb => cb(newToken));
+              // 重试完了别忘了清空这个队列（掘金评论区同学指点）
+              requests = [];
+            })
         } else {
-          Toast({
-            message: '登录过期，请重新登录',
-            duration: 1000,
-            forbidClick: true
+          // 正在刷新token，返回一个未执行resolve的promise
+          return new Promise((resolve) => {
+            // 将resolve放进队列，用一个函数形式来保存，等token刷新后直接执行
+            requests.push((token) => {
+              config.headers.Authorization = token
+              resolve(instance(config))
+            });
           });
         }
+        // } else {
+        //   Toast({
+        //     message: '登录过期，请重新登录',
+        //     duration: 1000,
+        //     forbidClick: true
+        //   });
+        // }
         break;
       default:
         Toast({

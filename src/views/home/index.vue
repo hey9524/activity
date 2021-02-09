@@ -18,6 +18,7 @@
     </van-notice-bar> -->
 
     <div class="overlay">
+      <img src="@/assets/index/jiemu.png" alt="" class="overlay-img">
       <van-swipe class="my-swipe" ref="swipe" @change="onChange" :show-indicators='false'>
         <van-swipe-item v-for="item in movieList" :key="item.id" lazy-render>
 
@@ -410,13 +411,16 @@
       flex-direction: column;
       align-items: center;
       width: calc(100% - 20px);
-      padding-bottom: 30px;
+      padding:20px 0 30px;
       background-color: rgba(255, 255, 255, .5);
+
+      &-img {
+        width: 150px;
+      }
 
       .my-swipe {
         width: 100%;
         height: 260px;
-        padding: 10px 0 0;
 
         .movie {
           position: absolute;
@@ -452,7 +456,7 @@
       .next {
         position: absolute;
         top: 50%;
-        transform: translateY(calc(-50% - 50px));
+        transform: translateY(calc(-50% - 30px));
         width: 15px;
       }
 
